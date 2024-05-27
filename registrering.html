@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vaktmester Registrering</title>
+</head>
+<body>
+    <form id="registrationForm">
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+        <label for="id">ID:</label>
+        <input type="text" id="id" name="id" required>
+        <label for="sted">Sted:</label>
+        <input type="text" id="sted" name="sted" required>
+        <button type="submit">Registrer</button>
+    </form>
+
+    <script>
+        document.getElementById('registrationForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+
+                    // Send form data to Integromat webhook
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", "https://hook.eu2.make.com/3y3mxvmwhuzhk3mja44t4mna2hu4nlw8", true);
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    xhr.send(JSON.stringify({
+                        id: document.getElementById('id').value,
+                        sted: document.getElementById('sted').value,
+                        latitude: document.getElementById('latitude').value,
+                        longitude: document.getElementById('longitude').value
+                    }));
+
+                    alert('Registreringen er sendt!');
+                });
+            } else {
+                alert('Geolocation er ikke støttet av denne nettleseren.');
+            }
+        });
+    </script>
+</body>
+</html>
